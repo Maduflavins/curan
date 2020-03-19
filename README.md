@@ -2,8 +2,10 @@
 An API inpmementation of a booking solution for hotels (with geo-search) using DjangoRestFramework.
 
 ## Installation
-`git clone https://github.com/iamr0b0tx/booker`
+clone the project
+create a virtual environment
+run `pip install -r requirements.txt`
 
 ## Execution
-`python main.py`
+`python manage.py runserver`
 

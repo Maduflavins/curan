@@ -18,6 +18,9 @@ CLIENT_ID = "K4S114CZZPVH0IYPWJHT4TASX2GYP4HM2ET1PLZM2ACLCO5Q"
 
 def fetch_hotels(longitude, latitude):
     ''' fet from api: for hotels '''
+    
+    longitude = request.GET["long"]
+    latitude = request.GET["lat"]
 
     # the api url
     url = f"https://api.foursquare.com/v2/venues/search?ll={longitude},{latitude}&client_id={CLIENT_ID}&client_secret={CLIENT_SECRET}&v={VERSION}&categoryId={CATEGORY_ID}"
@@ -36,17 +39,29 @@ def prepare_response(response):
     return HttpResponse(json.dumps(response))
 
 @require_http_methods(['GET'])
-def property_bookings(request, property_id=None):
+def property_bookings(request, property_name=None):
     ''' get all bookings for property_id '''
     # get response
     response = {status:False}
+    property_name = request.GET["hotel_name"]
 
-    if property_id is None or (type(property_id) == str and not property_id.isalnum()):
+    # if property_id is None or (type(property_id) == str and not property_id.isalnum()):
+    if property_name is None:
+        
         # respond
         return prepare_response(response)
     
     # write other code here
     # call places/hotels api ....
+    booked_hotel = Booking.query.filter(Booking.name==hotel_name)
+    if booked_hotel:
+        response = {
+            "message": "successful connection",
+            "name": booked_hotel.name,
+            "location": booked_hotel.location
+            
+        }
+    
 
     # respond
     return prepare_response(response)
@@ -54,14 +69,17 @@ def property_bookings(request, property_id=None):
 @require_http_methods(['GET'])
 def properties(request, lat=None, long=None):
     ''' get all properties at closest hotels to the lat and long provided '''
-    long = "6.5068271"
-    lat = "3.3783093"
+    long = request.GET["long"]
+    lat = request.GET["lat"]
+    # long = "6.5068271"
+    # lat = "3.3783093"
 
     def isfloat(text):
         ''' for cheking if a string is float '''
         return text.replace('.', '', 1).isdigit()
 
     response = {'status':False, 'data':[]}
+    
 
     # get response
     if lat is None or long is None or not isfloat(lat) or not isfloat(long):
@@ -94,6 +112,10 @@ def properties(request, lat=None, long=None):
     
     # respond
     return prepare_response(response)
+
+    
+    
+    
 
 # Create your views here.
 class BookingView(viewsets.ModelViewSet):
